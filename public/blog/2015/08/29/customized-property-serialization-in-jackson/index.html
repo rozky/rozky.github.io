@@ -1,0 +1,421 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>Customized Property Serialization in Jackson - My Octopress Blog</title>
+  <meta name="author" content="Your Name">
+
+  
+  <meta name="description" content="Recently I have faced a problem where I was asked to stop serializing selected object&rsquo;s properties into JSON
+(to protect sensible information &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://yoursite.com/blog/2015/08/29/customized-property-serialization-in-jackson/">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/atom.xml" rel="alternate" title="My Octopress Blog" type="application/atom+xml">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="/javascripts/libs/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="//fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="//fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">My Octopress Blog</a></h1>
+  
+    <h2>A blogging framework for hackers.</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="https://www.google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="sitesearch" value="yoursite.com">
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">Customized Property Serialization in Jackson</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2015-08-29T12:26:00+01:00'><span class='date'><span class='date-month'>Aug</span> <span class='date-day'>29</span><span class='date-suffix'>th</span>, <span class='date-year'>2015</span></span> <span class='time'>12:26 pm</span></time>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>Recently I have faced a problem where I was asked to stop serializing selected object&rsquo;s properties into JSON
+(to protect sensible information from being logged in json style logs). Code was using Jackson library which has
+lovely <code>@JsonIgnore</code> annotation specially designed for this type of problems. It almost looked too easy
+but luckily it was bit more complicated and had a change to learn more about Jackson internals.</p>
+
+<p>Issue was that the object was used as a rest api request so I couldn&rsquo;t just ignore a field as it will invalidate
+the request. At the same time it was being logged into the application log in the json format (json is easier to
+feed to Logstash) and we didn&rsquo;t wanted the field to be logged as it contains information not suitable for logging.</p>
+
+<p>During a search for a solution I had stumble upon <code>@JsonView</code> which looked promising but unfortunately it wasn&rsquo;t
+working as it works as inclusion(you tell it which property you want) but I needed exclusion(you tell it which property
+you don&rsquo;t want).</p>
+
+<p>At the I was forced to extend a few Jackson classes and configure a mapper to use them.</p>
+
+<p>Firstly I had to to create a custom property writer which gave me full control over property serialization so I could
+replace real property value with &lsquo;*&rsquo;.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">SensitivePropertyWriter</span> <span class="kd">extends</span> <span class="n">BeanPropertyWriter</span> <span class="o">{</span>
+</span><span class='line'>    <span class="kd">private</span> <span class="kd">final</span> <span class="n">BeanPropertyWriter</span> <span class="n">writer</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="kd">public</span> <span class="nf">SensitivePropertyWriter</span><span class="o">(</span><span class="n">BeanPropertyWriter</span> <span class="n">writer</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>        <span class="kd">super</span><span class="o">(</span><span class="n">writer</span><span class="o">);</span>
+</span><span class='line'>        <span class="k">this</span><span class="o">.</span><span class="na">writer</span> <span class="o">=</span> <span class="n">writer</span><span class="o">;</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="nd">@Override</span>
+</span><span class='line'>    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">serializeAsField</span><span class="o">(</span><span class="n">Object</span> <span class="n">bean</span><span class="o">,</span>
+</span><span class='line'>                                 <span class="n">JsonGenerator</span> <span class="n">gen</span><span class="o">,</span>
+</span><span class='line'>                                 <span class="n">SerializerProvider</span> <span class="n">prov</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">Exception</span> <span class="o">{</span>
+</span><span class='line'>        <span class="n">Object</span> <span class="n">value</span> <span class="o">=</span> <span class="n">writer</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="n">bean</span><span class="o">);</span>
+</span><span class='line'>        <span class="k">if</span> <span class="o">(</span><span class="n">value</span> <span class="o">!=</span> <span class="kc">null</span> <span class="o">&amp;&amp;</span> <span class="n">value</span> <span class="k">instanceof</span> <span class="n">String</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>            <span class="n">String</span> <span class="n">strValue</span> <span class="o">=</span> <span class="o">(</span><span class="n">String</span><span class="o">)</span> <span class="n">value</span><span class="o">;</span>
+</span><span class='line'>            <span class="n">gen</span><span class="o">.</span><span class="na">writeStringField</span><span class="o">(</span><span class="n">writer</span><span class="o">.</span><span class="na">getName</span><span class="o">(),</span> <span class="n">StringUtils</span><span class="o">.</span><span class="na">repeat</span><span class="o">(</span><span class="s">&quot;*&quot;</span><span class="o">,</span> <span class="n">strValue</span><span class="o">.</span><span class="na">length</span><span class="o">()));</span>
+</span><span class='line'>        <span class="o">}</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="nd">@Override</span>
+</span><span class='line'>    <span class="kd">public</span> <span class="n">BeanPropertyWriter</span> <span class="nf">withSerializer</span><span class="o">(</span><span class="n">JsonSerializer</span><span class="o">&lt;</span><span class="n">Object</span><span class="o">&gt;</span> <span class="n">ser</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>        <span class="k">return</span> <span class="k">this</span><span class="o">;</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The next step was to write a custom bean modifier in which I could configure custom property write on property by property
+base. I have just used regexp to match potentially sensitive fields but you can always go a step further and create
+an annotation.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kn">import</span> <span class="nn">org.codehaus.jackson.map.SerializationConfig</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">org.codehaus.jackson.map.introspect.BasicBeanDescription</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">org.codehaus.jackson.map.ser.BeanPropertyWriter</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">org.codehaus.jackson.map.ser.BeanSerializerModifier</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="kn">import</span> <span class="nn">java.util.List</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">java.util.regex.Pattern</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">SensitivePropertySerializerModifier</span> <span class="kd">extends</span> <span class="n">BeanSerializerModifier</span> <span class="o">{</span>
+</span><span class='line'>    <span class="kd">private</span> <span class="kd">static</span> <span class="kd">final</span> <span class="n">Pattern</span> <span class="n">PASSWORD_PATTERN</span> <span class="o">=</span> <span class="n">Pattern</span><span class="o">.</span><span class="na">compile</span><span class="o">(</span><span class="s">&quot;(?i)password&quot;</span><span class="o">);</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="nd">@Override</span>
+</span><span class='line'>    <span class="kd">public</span> <span class="n">List</span><span class="o">&lt;</span><span class="n">BeanPropertyWriter</span><span class="o">&gt;</span> <span class="nf">changeProperties</span><span class="o">(</span><span class="n">SerializationConfig</span> <span class="n">config</span><span class="o">,</span>
+</span><span class='line'>                                                     <span class="n">BasicBeanDescription</span> <span class="n">beanDesc</span><span class="o">,</span>
+</span><span class='line'>                                                     <span class="n">List</span><span class="o">&lt;</span><span class="n">BeanPropertyWriter</span><span class="o">&gt;</span> <span class="n">beanProperties</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>        <span class="k">for</span> <span class="o">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="o">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">beanProperties</span><span class="o">.</span><span class="na">size</span><span class="o">();</span> <span class="n">i</span><span class="o">++)</span> <span class="o">{</span>
+</span><span class='line'>            <span class="n">BeanPropertyWriter</span> <span class="n">writer</span> <span class="o">=</span> <span class="n">beanProperties</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="n">i</span><span class="o">);</span>
+</span><span class='line'>            <span class="k">if</span> <span class="o">(</span><span class="n">PASSWORD_PATTERN</span><span class="o">.</span><span class="na">matcher</span><span class="o">(</span><span class="n">writer</span><span class="o">.</span><span class="na">getName</span><span class="o">()).</span><span class="na">find</span><span class="o">())</span> <span class="o">{</span>
+</span><span class='line'>                <span class="n">beanProperties</span><span class="o">.</span><span class="na">set</span><span class="o">(</span><span class="n">i</span><span class="o">,</span> <span class="k">new</span> <span class="nf">SensitivePropertyWriter</span><span class="o">(</span><span class="n">writer</span><span class="o">));</span>
+</span><span class='line'>            <span class="o">}</span>
+</span><span class='line'>        <span class="o">}</span>
+</span><span class='line'>        <span class="k">return</span> <span class="n">beanProperties</span><span class="o">;</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The last step was to configure ObjectMapper to use our new serializer modifier and test it.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+<span class='line-number'>48</span>
+<span class='line-number'>49</span>
+<span class='line-number'>50</span>
+<span class='line-number'>51</span>
+<span class='line-number'>52</span>
+<span class='line-number'>53</span>
+<span class='line-number'>54</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kn">import</span> <span class="nn">org.codehaus.jackson.map.ObjectMapper</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">org.codehaus.jackson.map.SerializationConfig</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">org.codehaus.jackson.map.SerializerFactory</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">org.codehaus.jackson.map.ser.BeanSerializerFactory</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">org.junit.Test</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="kn">import</span> <span class="nn">java.io.IOException</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="kn">import</span> <span class="nn">static</span> <span class="n">org</span><span class="o">.</span><span class="na">fest</span><span class="o">.</span><span class="na">assertions</span><span class="o">.</span><span class="na">api</span><span class="o">.</span><span class="na">Assertions</span><span class="o">.</span><span class="na">assertThat</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">SensitivePropertySerializerModifierTest</span> <span class="o">{</span>
+</span><span class='line'>    <span class="kd">private</span> <span class="n">ObjectMapper</span> <span class="n">mapper</span> <span class="o">=</span> <span class="n">createMapper</span><span class="o">();</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="kd">public</span> <span class="n">ObjectMapper</span> <span class="nf">createMapper</span><span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>        <span class="n">SensitivePropertySerializerModifier</span> <span class="n">modifier</span> <span class="o">=</span> <span class="k">new</span> <span class="nf">SensitivePropertySerializerModifier</span><span class="o">();</span>
+</span><span class='line'>        <span class="n">SerializerFactory</span> <span class="n">sf</span> <span class="o">=</span> <span class="n">BeanSerializerFactory</span><span class="o">.</span><span class="na">instance</span><span class="o">.</span><span class="na">withSerializerModifier</span><span class="o">(</span><span class="n">modifier</span><span class="o">);</span>
+</span><span class='line'>
+</span><span class='line'>        <span class="n">ObjectMapper</span> <span class="n">mapper</span> <span class="o">=</span> <span class="k">new</span> <span class="nf">ObjectMapper</span><span class="o">();</span>
+</span><span class='line'>        <span class="n">mapper</span><span class="o">.</span><span class="na">setSerializerFactory</span><span class="o">(</span><span class="n">sf</span><span class="o">);</span>
+</span><span class='line'>
+</span><span class='line'>        <span class="k">return</span> <span class="n">mapper</span><span class="o">;</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="nd">@Test</span>
+</span><span class='line'>    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">shouldMaskPasswordFields</span><span class="o">()</span> <span class="kd">throws</span> <span class="n">IOException</span> <span class="o">{</span>
+</span><span class='line'>        <span class="c1">// given</span>
+</span><span class='line'>        <span class="n">mapper</span><span class="o">.</span><span class="na">enable</span><span class="o">(</span><span class="n">SerializationConfig</span><span class="o">.</span><span class="na">Feature</span><span class="o">.</span><span class="na">SORT_PROPERTIES_ALPHABETICALLY</span><span class="o">);</span>
+</span><span class='line'>
+</span><span class='line'>        <span class="c1">// when</span>
+</span><span class='line'>        <span class="n">String</span> <span class="n">json</span> <span class="o">=</span> <span class="n">mapper</span><span class="o">.</span><span class="na">writeValueAsString</span><span class="o">(</span><span class="k">new</span> <span class="nf">TestObject</span><span class="o">(</span><span class="s">&quot;password123&quot;</span><span class="o">));</span>
+</span><span class='line'>
+</span><span class='line'>        <span class="c1">// then</span>
+</span><span class='line'>        <span class="n">assertThat</span><span class="o">(</span><span class="n">json</span><span class="o">).</span><span class="na">isEqualTo</span><span class="o">(</span><span class="s">&quot;{\&quot;password\&quot;:\&quot;***********\&quot;}&quot;</span><span class="o">);</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="kd">public</span> <span class="kd">static</span> <span class="kd">class</span> <span class="nc">TestObject</span> <span class="o">{</span>
+</span><span class='line'>        <span class="kd">private</span> <span class="n">String</span> <span class="n">password</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'>        <span class="kd">public</span> <span class="nf">TestObject</span><span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>        <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>        <span class="kd">public</span> <span class="nf">TestObject</span><span class="o">(</span><span class="n">String</span> <span class="n">password</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>            <span class="k">this</span><span class="o">.</span><span class="na">password</span> <span class="o">=</span> <span class="n">password</span><span class="o">;</span>
+</span><span class='line'>        <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>        <span class="kd">public</span> <span class="n">String</span> <span class="nf">getPassword</span><span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>            <span class="k">return</span> <span class="n">password</span><span class="o">;</span>
+</span><span class='line'>        <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>        <span class="kd">public</span> <span class="kt">void</span> <span class="nf">setPassword</span><span class="o">(</span><span class="n">String</span> <span class="n">password</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>            <span class="k">this</span><span class="o">.</span><span class="na">password</span> <span class="o">=</span> <span class="n">password</span><span class="o">;</span>
+</span><span class='line'>        <span class="o">}</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Your Name</span></span>
+
+      
+
+
+
+
+<time class='entry-date' datetime='2015-08-29T12:26:00+01:00'><span class='date'><span class='date-month'>Aug</span> <span class='date-day'>29</span><span class='date-suffix'>th</span>, <span class='date-year'>2015</span></span> <span class='time'>12:26 pm</span></time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/jackson/'>jackson,</a>, <a class='category' href='/blog/categories/java/'>java,</a>, <a class='category' href='/blog/categories/json/'>json</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://yoursite.com/blog/2015/08/29/customized-property-serialization-in-jackson/" data-via="" data-counturl="http://yoursite.com/blog/2015/08/29/customized-property-serialization-in-jackson/" >Tweet</a>
+  
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+      
+    </p>
+  </footer>
+</article>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2015/08/29/customized-property-serialization-in-jackson/">Customized Property Serialization in Jackson</a>
+      </li>
+    
+  </ul>
+</section>
+
+
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2015 - Your Name -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+
+
+
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = '//platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>
