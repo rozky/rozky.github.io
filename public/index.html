@@ -5,12 +5,12 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>My Octopress Blog</title>
+  <title>Roozky's Wonders</title>
   <meta name="author" content="Your Name">
 
   
-  <meta name="description" content="Recently I have faced a problem where I was asked to stop serializing selected object&rsquo;s properties into JSON
-(to protect sensible information &hellip;">
+  <meta name="description" content="This is a list of cURL commands I found myself using regularly. More examples with deeper explanation can be
+found here Behind proxy If you find &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -19,10 +19,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://yoursite.com/">
+  <link rel="canonical" href="http://roozky.herokuapp.com//">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
-  <link href="/atom.xml" rel="alternate" title="My Octopress Blog" type="application/atom+xml">
+  <link href="/atom.xml" rel="alternate" title="Roozky's Wonders" type="application/atom+xml">
   <script src="/javascripts/modernizr-2.0.js"></script>
   <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
   <script>!window.jQuery && document.write(unescape('%3Cscript src="/javascripts/libs/jquery.min.js"%3E%3C/script%3E'))</script>
@@ -34,7 +34,7 @@
   
   <script type="text/javascript">
     var _gaq = _gaq || [];
-    _gaq.push(['_setAccount', 'UA-66925471-1']);
+    _gaq.push(['_setAccount', 'UA-48068232-2']);
     _gaq.push(['_trackPageview']);
 
     (function() {
@@ -49,9 +49,9 @@
 
 <body   >
   <header role="banner"><hgroup>
-  <h1><a href="/">My Octopress Blog</a></h1>
+  <h1><a href="/">Roozky's Wonders</a></h1>
   
-    <h2>A blogging framework for hackers.</h2>
+    <h2>Blogging about programming</h2>
   
 </hgroup>
 
@@ -63,7 +63,7 @@
   
 <form action="https://www.google.com/search" method="get">
   <fieldset role="search">
-    <input type="hidden" name="sitesearch" value="yoursite.com">
+    <input type="hidden" name="sitesearch" value="roozky.herokuapp.com/">
     <input class="search" type="text" name="q" results="0" placeholder="Search"/>
   </fieldset>
 </form>
@@ -78,6 +78,79 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2015/09/09/mastering-curl-by-example/">Mastering cURL by Example</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2015-09-09T19:13:57+01:00'><span class='date'><span class='date-month'>Sep</span> <span class='date-day'>9</span><span class='date-suffix'>th</span>, <span class='date-year'>2015</span></span> <span class='time'>7:13 pm</span></time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>This is a list of cURL commands I found myself using regularly. More examples with deeper explanation can be
+found <a href="http://curl.haxx.se/docs/httpscripting.html">here</a></p>
+
+<h3>Behind proxy</h3>
+
+<p>If you find yourself on a computer that is sitting behind a proxy:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>curl --proxy http://proxy.example.org:4321 http://remote.example.org/
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>Form submit with data url-encoded manually</h3>
+
+<p>Simulates a form submission by <code>POST</code> with <code>application/x-www-form-urlencoded</code> content type and data url-encoded by you.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>curl -d <span class="s2">&quot;year=1905&amp;name=You+Me&quot;</span> http://www.example.com/form-submit
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>Form submit with data url-encoding automatically</h3>
+
+<p>Simulates a form submission by <code>POST</code> with <code>application/x-www-form-urlencoded</code> content type and data url-encoded by curl itself.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>curl --data-urlencode <span class="s2">&quot;name=Joe Me&quot;</span> http://www.example.com/form-submit
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>POST request with JSON body</h3>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>curl -H <span class="s2">&quot;Content-Type: application/json&quot;</span> -d <span class="s2">&quot;{&#39;happy&#39;: &#39;yes&#39;}&quot;</span> http://www.example.com/json
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>Taking the request body from stdin</h3>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nb">echo</span> <span class="s1">&#39;{&quot;text&quot;: &quot;Hello **world**!&quot;}&#39;</span> <span class="p">|</span> curl -d @- https://api.github.com/markdown
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -354,6 +427,10 @@ an annotation.</p>
     <section>
   <h1>Recent Posts</h1>
   <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2015/09/09/mastering-curl-by-example/">Mastering cURL by Example</a>
+      </li>
     
       <li class="post">
         <a href="/blog/2015/08/29/customized-property-serialization-in-jackson/">Customized Property Serialization in Jackson</a>

@@ -4,7 +4,7 @@ title: "Customized property serialization in Jackson"
 date: 2015-08-29 12:26:00 +0100
 comments: true
 published: true
-categories: Jackson, Java, Json
+categories: jackson java json
 ---
 Recently I have faced a problem where I was asked to stop serializing selected object's properties into JSON 
 (to protect sensible information from being logged in json style logs). Code was using Jackson library which has 

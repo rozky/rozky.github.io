@@ -2,9 +2,9 @@
 #      Main Configs       #
 # ----------------------- #
 
-url: http://yoursite.com
-title: My Octopress Blog
-subtitle: A blogging framework for hackers.
+url: http://roozky.herokuapp.com/
+title: Roozky's Wonders
+subtitle: Blogging about programming
 author: Your Name
 simple_search: https://www.google.com/search
 description:
@@ -95,7 +95,7 @@ disqus_short_name:
 disqus_show_comment_count: false
 
 # Google Analytics
-google_analytics_tracking_id: UA-66925471-1
+google_analytics_tracking_id: UA-48068232-2
 
 # Facebook Like
 facebook_like: false

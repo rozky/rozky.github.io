@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom">
 
-  <title><![CDATA[My Octopress Blog]]></title>
-  <link href="http://yoursite.com/atom.xml" rel="self"/>
-  <link href="http://yoursite.com/"/>
-  <updated>2015-08-30T22:50:28+01:00</updated>
-  <id>http://yoursite.com/</id>
+  <title><![CDATA[Roozky's Wonders]]></title>
+  <link href="http://roozky.herokuapp.com//atom.xml" rel="self"/>
+  <link href="http://roozky.herokuapp.com//"/>
+  <updated>2015-09-09T21:29:16+01:00</updated>
+  <id>http://roozky.herokuapp.com//</id>
   <author>
     <name><![CDATA[Your Name]]></name>
     
@@ -14,10 +14,63 @@
 
   
   <entry>
+    <title type="html"><![CDATA[Mastering cURL by Example]]></title>
+    <link href="http://roozky.herokuapp.com//blog/2015/09/09/mastering-curl-by-example/"/>
+    <updated>2015-09-09T19:13:57+01:00</updated>
+    <id>http://roozky.herokuapp.com//blog/2015/09/09/mastering-curl-by-example</id>
+    <content type="html"><![CDATA[<p>This is a list of cURL commands I found myself using regularly. More examples with deeper explanation can be
+found <a href="http://curl.haxx.se/docs/httpscripting.html">here</a></p>
+
+<h3>Behind proxy</h3>
+
+<p>If you find yourself on a computer that is sitting behind a proxy:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>curl --proxy http://proxy.example.org:4321 http://remote.example.org/
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>Form submit with data url-encoded manually</h3>
+
+<p>Simulates a form submission by <code>POST</code> with <code>application/x-www-form-urlencoded</code> content type and data url-encoded by you.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>curl -d <span class="s2">&quot;year=1905&amp;name=You+Me&quot;</span> http://www.example.com/form-submit
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>Form submit with data url-encoding automatically</h3>
+
+<p>Simulates a form submission by <code>POST</code> with <code>application/x-www-form-urlencoded</code> content type and data url-encoded by curl itself.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>curl --data-urlencode <span class="s2">&quot;name=Joe Me&quot;</span> http://www.example.com/form-submit
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>POST request with JSON body</h3>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>curl -H <span class="s2">&quot;Content-Type: application/json&quot;</span> -d <span class="s2">&quot;{&#39;happy&#39;: &#39;yes&#39;}&quot;</span> http://www.example.com/json
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>Taking the request body from stdin</h3>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nb">echo</span> <span class="s1">&#39;{&quot;text&quot;: &quot;Hello **world**!&quot;}&#39;</span> <span class="p">|</span> curl -d @- https://api.github.com/markdown
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+]]></content>
+  </entry>
+  
+  <entry>
     <title type="html"><![CDATA[Customized Property Serialization in Jackson]]></title>
-    <link href="http://yoursite.com/blog/2015/08/29/customized-property-serialization-in-jackson/"/>
+    <link href="http://roozky.herokuapp.com//blog/2015/08/29/customized-property-serialization-in-jackson/"/>
     <updated>2015-08-29T12:26:00+01:00</updated>
-    <id>http://yoursite.com/blog/2015/08/29/customized-property-serialization-in-jackson</id>
+    <id>http://roozky.herokuapp.com//blog/2015/08/29/customized-property-serialization-in-jackson</id>
     <content type="html"><![CDATA[<p>Recently I have faced a problem where I was asked to stop serializing selected object&rsquo;s properties into JSON
 (to protect sensible information from being logged in json style logs). Code was using Jackson library which has
 lovely <code>@JsonIgnore</code> annotation specially designed for this type of problems. It almost looked too easy
