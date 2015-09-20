@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Example | Roozky's Wonders]]></title>
   <link href="http://roozky.herokuapp.com//blog/categories/example/atom.xml" rel="self"/>
   <link href="http://roozky.herokuapp.com//"/>
-  <updated>2015-09-09T21:29:16+01:00</updated>
+  <updated>2015-09-20T19:24:05+01:00</updated>
   <id>http://roozky.herokuapp.com//</id>
   <author>
     <name><![CDATA[Your Name]]></name>
@@ -21,7 +21,7 @@
     <content type="html"><![CDATA[<p>This is a list of cURL commands I found myself using regularly. More examples with deeper explanation can be
 found <a href="http://curl.haxx.se/docs/httpscripting.html">here</a></p>
 
-<h3>Behind proxy</h3>
+<h3>If you find yourself sitting behind a proxy</h3>
 
 <p>If you find yourself on a computer that is sitting behind a proxy:</p>
 
@@ -42,15 +42,54 @@ found <a href="http://curl.haxx.se/docs/httpscripting.html">here</a></p>
 <pre><code>curl --data-urlencode "name=Joe Me" http://www.example.com/form-submit
 </code></pre>
 
-<h3>POST request with JSON body</h3>
+<h3>POST with JSON body</h3>
 
 <pre><code>curl -H "Content-Type: application/json" -d "{'happy': 'yes'}" http://www.example.com/json
 </code></pre>
 
-<h3>Taking the request body from stdin</h3>
+<h3>Take a body from stdin</h3>
 
 <pre><code class="bash">echo '{"text": "Hello **world**!"}' | curl -d @- https://api.github.com/markdown
 </code></pre>
+
+<h3>Output HTTP status only</h3>
+
+<pre><code class="bash">curl  http://www.google.com -sL -w "%{http_code}\\n" -o /dev/null
+</code></pre>
+
+<p>The key flat here is <code>-w</code> which prints the report using a custom format. Here is a list of available custom variables:</p>
+
+<pre><code>url_effective
+http_code
+http_connect
+time_total
+time_namelookup
+time_connect
+time_pretransfer
+time_redirect
+time_starttransfer
+size_download
+size_upload
+size_header
+size_request
+speed_download
+speed_upload
+content_type
+num_connects
+num_redirects
+ftp_entry_path
+</code></pre>
+
+<h3>Check status of multiple URLs</h3>
+
+<pre><code class="bash">for i in gumtree bbc; do curl  http://www.$i.com -sL -w "%{http_code} %{url_effective}\\n" -o /dev/null; done
+</code></pre>
+
+<p>Outputs:
+<code>
+200 https://www.gumtree.com/
+200 http://www.bbc.com/
+</code></p>
 ]]></content>
   </entry>
   

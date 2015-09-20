@@ -10,7 +10,7 @@
 
   
   <meta name="description" content="This is a list of cURL commands I found myself using regularly. More examples with deeper explanation can be
-found here Behind proxy If you find &hellip;">
+found here If you find yourself sitting &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -34,7 +34,7 @@ found here Behind proxy If you find &hellip;">
   
   <script type="text/javascript">
     var _gaq = _gaq || [];
-    _gaq.push(['_setAccount', 'UA-48068232-2']);
+    _gaq.push(['_setAccount', 'UA-48068232-1']);
     _gaq.push(['_trackPageview']);
 
     (function() {
@@ -103,7 +103,7 @@ found here Behind proxy If you find &hellip;">
   <div class="entry-content"><p>This is a list of cURL commands I found myself using regularly. More examples with deeper explanation can be
 found <a href="http://curl.haxx.se/docs/httpscripting.html">here</a></p>
 
-<h3>Behind proxy</h3>
+<h3>If you find yourself sitting behind a proxy</h3>
 
 <p>If you find yourself on a computer that is sitting behind a proxy:</p>
 
@@ -130,17 +130,63 @@ found <a href="http://curl.haxx.se/docs/httpscripting.html">here</a></p>
 </span></code></pre></td></tr></table></div></figure>
 
 
-<h3>POST request with JSON body</h3>
+<h3>POST with JSON body</h3>
 
 <figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 </pre></td><td class='code'><pre><code class='bash'><span class='line'>curl -H <span class="s2">&quot;Content-Type: application/json&quot;</span> -d <span class="s2">&quot;{&#39;happy&#39;: &#39;yes&#39;}&quot;</span> http://www.example.com/json
 </span></code></pre></td></tr></table></div></figure>
 
 
-<h3>Taking the request body from stdin</h3>
+<h3>Take a body from stdin</h3>
 
 <figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 </pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nb">echo</span> <span class="s1">&#39;{&quot;text&quot;: &quot;Hello **world**!&quot;}&#39;</span> <span class="p">|</span> curl -d @- https://api.github.com/markdown
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>Output HTTP status only</h3>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>curl  http://www.google.com -sL -w <span class="s2">&quot;%{http_code}\\n&quot;</span> -o /dev/null
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The key flat here is <code>-w</code> which prints the report using a custom format. Here is a list of available custom variables:</p>
+
+<pre><code>url_effective
+http_code
+http_connect
+time_total
+time_namelookup
+time_connect
+time_pretransfer
+time_redirect
+time_starttransfer
+size_download
+size_upload
+size_header
+size_request
+speed_download
+speed_upload
+content_type
+num_connects
+num_redirects
+ftp_entry_path
+</code></pre>
+
+<h3>Check status of multiple URLs</h3>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="k">for</span> i in gumtree bbc<span class="p">;</span> <span class="k">do</span> curl  http://www.<span class="nv">$i</span>.com -sL -w <span class="s2">&quot;%{http_code} %{url_effective}\\n&quot;</span> -o /dev/null<span class="p">;</span> <span class="k">done</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Outputs:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="m">200</span> https://www.gumtree.com/
+</span><span class='line'><span class="m">200</span> http://www.bbc.com/
 </span></code></pre></td></tr></table></div></figure>
 
 

@@ -10,6 +10,12 @@ published: false
 For a purpose of this blog post I have create a git repository with single file in it which should provide me enough 
 complexity to play with. `git clone https://github.com/rozky/git-basics.git`
 
+### Delete branch
+
+```
+git branch -d BRANCH
+```
+
 ### Clean up unused local branches
 ### Clean up unused remote branches
 
