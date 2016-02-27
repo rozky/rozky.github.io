@@ -2,10 +2,10 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
 
   <title><![CDATA[Category: Cli | Roozky's Wonders]]></title>
-  <link href="http://roozky.herokuapp.com//blog/categories/cli/atom.xml" rel="self"/>
-  <link href="http://roozky.herokuapp.com//"/>
-  <updated>2015-09-20T19:24:05+01:00</updated>
-  <id>http://roozky.herokuapp.com//</id>
+  <link href="http://rozky.github.io/blog/categories/cli/atom.xml" rel="self"/>
+  <link href="http://rozky.github.io/"/>
+  <updated>2016-02-27T23:06:24+00:00</updated>
+  <id>http://rozky.github.io/</id>
   <author>
     <name><![CDATA[Your Name]]></name>
     
@@ -15,9 +15,9 @@
   
   <entry>
     <title type="html"><![CDATA[Mastering cURL by Example]]></title>
-    <link href="http://roozky.herokuapp.com//blog/2015/09/09/mastering-curl-by-example/"/>
+    <link href="http://rozky.github.io/blog/2015/09/09/mastering-curl-by-example/"/>
     <updated>2015-09-09T19:13:57+01:00</updated>
-    <id>http://roozky.herokuapp.com//blog/2015/09/09/mastering-curl-by-example</id>
+    <id>http://rozky.github.io/blog/2015/09/09/mastering-curl-by-example</id>
     <content type="html"><![CDATA[<p>This is a list of cURL commands I found myself using regularly. More examples with deeper explanation can be
 found <a href="http://curl.haxx.se/docs/httpscripting.html">here</a></p>
 
@@ -87,7 +87,7 @@ ftp_entry_path
 
 <p>Outputs:
 <code>
-200 https://www.gumtree.com/
+200 http://www.gumtree.com/
 200 http://www.bbc.com/
 </code></p>
 ]]></content>

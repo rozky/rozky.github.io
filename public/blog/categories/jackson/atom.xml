@@ -2,10 +2,10 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
 
   <title><![CDATA[Category: Jackson | Roozky's Wonders]]></title>
-  <link href="http://roozky.herokuapp.com//blog/categories/jackson/atom.xml" rel="self"/>
-  <link href="http://roozky.herokuapp.com//"/>
-  <updated>2015-09-20T19:24:05+01:00</updated>
-  <id>http://roozky.herokuapp.com//</id>
+  <link href="http://rozky.github.io/blog/categories/jackson/atom.xml" rel="self"/>
+  <link href="http://rozky.github.io/"/>
+  <updated>2016-02-27T23:06:24+00:00</updated>
+  <id>http://rozky.github.io/</id>
   <author>
     <name><![CDATA[Your Name]]></name>
     
@@ -15,9 +15,9 @@
   
   <entry>
     <title type="html"><![CDATA[Customized Property Serialization in Jackson]]></title>
-    <link href="http://roozky.herokuapp.com//blog/2015/08/29/customized-property-serialization-in-jackson/"/>
+    <link href="http://rozky.github.io/blog/2015/08/29/customized-property-serialization-in-jackson/"/>
     <updated>2015-08-29T12:26:00+01:00</updated>
-    <id>http://roozky.herokuapp.com//blog/2015/08/29/customized-property-serialization-in-jackson</id>
+    <id>http://rozky.github.io/blog/2015/08/29/customized-property-serialization-in-jackson</id>
     <content type="html"><![CDATA[<p>Recently I have faced a problem where I was asked to stop serializing selected object&rsquo;s properties into JSON
 (to protect sensible information from being logged in json style logs). Code was using Jackson library which has
 lovely <code>@JsonIgnore</code> annotation specially designed for this type of problems. It almost looked too easy

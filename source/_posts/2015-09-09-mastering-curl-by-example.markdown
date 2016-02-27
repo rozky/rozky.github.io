@@ -4,7 +4,7 @@ title: "Mastering cURL by example"
 date: 2015-09-09 19:13:57 +0100
 comments: true
 published: true
-categories: curl bash cli http proxy example 
+categories: curl bash cli http proxy example
 ---
 
 This is a list of cURL commands I found myself using regularly. More examples with deeper explanation can be 
@@ -81,7 +81,7 @@ for i in gumtree bbc; do curl  http://www.$i.com -sL -w "%{http_code} %{url_effe
 
 Outputs:
 ```
-200 https://www.gumtree.com/
+200 http://www.gumtree.com/
 200 http://www.bbc.com/
 ```
 

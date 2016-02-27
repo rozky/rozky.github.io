@@ -1,44 +1,44 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd" xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>http://roozky.herokuapp.com//blog/2015/09/09/mastering-curl-by-example/</loc>
+    <loc>http://rozky.github.io/blog/2015/09/09/mastering-curl-by-example/</loc>
     <lastmod>2015-09-09T19:13:57+01:00</lastmod>
   </url>
   <url>
-    <loc>http://roozky.herokuapp.com//blog/2015/08/29/customized-property-serialization-in-jackson/</loc>
+    <loc>http://rozky.github.io/blog/2015/08/29/customized-property-serialization-in-jackson/</loc>
     <lastmod>2015-08-29T12:26:00+01:00</lastmod>
   </url>
   <url>
-    <loc>http://roozky.herokuapp.com//blog/archives/</loc>
+    <loc>http://rozky.github.io/blog/archives/</loc>
   </url>
   <url>
-    <loc>http://roozky.herokuapp.com//</loc>
+    <loc>http://rozky.github.io/</loc>
   </url>
   <url>
-    <loc>http://roozky.herokuapp.com//blog/categories/jackson/</loc>
+    <loc>http://rozky.github.io/blog/categories/jackson/</loc>
   </url>
   <url>
-    <loc>http://roozky.herokuapp.com//blog/categories/java/</loc>
+    <loc>http://rozky.github.io/blog/categories/java/</loc>
   </url>
   <url>
-    <loc>http://roozky.herokuapp.com//blog/categories/json/</loc>
+    <loc>http://rozky.github.io/blog/categories/json/</loc>
   </url>
   <url>
-    <loc>http://roozky.herokuapp.com//blog/categories/curl/</loc>
+    <loc>http://rozky.github.io/blog/categories/curl/</loc>
   </url>
   <url>
-    <loc>http://roozky.herokuapp.com//blog/categories/bash/</loc>
+    <loc>http://rozky.github.io/blog/categories/bash/</loc>
   </url>
   <url>
-    <loc>http://roozky.herokuapp.com//blog/categories/cli/</loc>
+    <loc>http://rozky.github.io/blog/categories/cli/</loc>
   </url>
   <url>
-    <loc>http://roozky.herokuapp.com//blog/categories/http/</loc>
+    <loc>http://rozky.github.io/blog/categories/http/</loc>
   </url>
   <url>
-    <loc>http://roozky.herokuapp.com//blog/categories/proxy/</loc>
+    <loc>http://rozky.github.io/blog/categories/proxy/</loc>
   </url>
   <url>
-    <loc>http://roozky.herokuapp.com//blog/categories/example/</loc>
+    <loc>http://rozky.github.io/blog/categories/example/</loc>
   </url>
 </urlset>

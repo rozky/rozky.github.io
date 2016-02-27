@@ -1,4 +1,4 @@
 User-agent: *
 Disallow: 
 
-Sitemap: http://roozky.herokuapp.com//sitemap.xml 
+Sitemap: http://rozky.github.io/sitemap.xml 
